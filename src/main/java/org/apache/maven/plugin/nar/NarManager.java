@@ -53,6 +53,10 @@ public class NarManager
 
 	private ArtifactRepository repository;
 
+	private List /* ArtifactRepository */ remoteRepositories;
+
+	private ArtifactResolver resolver;
+
 	private AOL defaultAOL;
 
 	private String linkerName;
@@ -60,12 +64,23 @@ public class NarManager
     private String[] narTypes =
         { NarConstants.NAR_NO_ARCH, Library.STATIC, Library.SHARED, Library.JNI, Library.PLUGIN };
 
+    /** @Deprecated */
     public NarManager( Log log, ArtifactRepository repository, MavenProject project, String architecture, String os,
                        Linker linker )
         throws MojoFailureException, MojoExecutionException
     {
+		this( log, repository, null, null, project, architecture, os, linker );
+    }
+
+    public NarManager( Log log, ArtifactRepository localRepository, List /* ArtifactRepository */ remoteRepositories,
+                       ArtifactResolver artifactResolver, MavenProject project, String architecture, String os,
+                       Linker linker )
+        throws MojoFailureException, MojoExecutionException
+    {
 		this.log = log;
-		this.repository = repository;
+		this.repository = localRepository;
+		this.remoteRepositories = remoteRepositories;
+		this.resolver = artifactResolver;
 		this.project = project;
 		this.defaultAOL = NarUtil.getAOL(project, architecture, os, linker, null);
 		this.linkerName = NarUtil.getLinkerName(project, architecture, os, linker);
@@ -284,6 +299,22 @@ public class NarManager
 		// of getBaseVersion, called in pathOf.
 		dependency.isSnapshot();
 
+        try
+        {
+            if ( "nar".equalsIgnoreCase(dependency.getType()) )
+            {
+                log.debug("Download URL is: " + dependency.getDownloadUrl() + " for " + dependency.getArtifactId() + ":" + dependency.getScope() + ":" + dependency.getType());
+                resolver.resolve(dependency, remoteRepositories, repository);
+            }
+        }
+        catch (ArtifactResolutionException ex)
+        {
+            log.warn("Couldn't resolve artifact", ex);
+        }
+        catch (ArtifactNotFoundException ex)
+        {
+            log.warn("No Artifact found", ex);
+        }
         File file = new File( repository.getBasedir(), repository.pathOf( dependency ) );
         log.debug("File location: " + file.getAbsolutePath());
         if ( !file.exists() )
@@ -330,6 +361,19 @@ public class NarManager
 		// FIXME reported to maven developer list, isSnapshot changes behaviour
 		// of getBaseVersion, called in pathOf.
 		dependency.isSnapshot();
+        try {
+            if(log.isDebugEnabled()){
+                log.debug("Trying to obtain NarFile :" + NarUtil.replace("${aol}", defaultAOL.toString(), repository.pathOf(dependency))
+                        + ", DefaultAOL: " + defaultAOL.toString()
+                        + ", Repo Path: " + repository.pathOf(dependency)
+                        + ", Dependency: " + dependency.toString());
+            }
+            resolver.resolve(dependency, remoteRepositories, repository);
+        } catch (ArtifactResolutionException ex) {
+            ex.printStackTrace();
+        } catch (ArtifactNotFoundException ex) {
+            ex.printStackTrace();
+        }
         return new File( repository.getBasedir(), NarUtil.replace( "${aol}", defaultAOL.toString(),
                                                                    repository.pathOf( dependency ) ) );
 	}
@@ -364,6 +408,17 @@ public class NarManager
 			    log.debug("  - " + (i.next()));
 		    }
 		    log.debug("}");
+        }
+
+        final List remoteRepositories;
+        if ( extraRemoteRepositories == null || extraRemoteRepositories.isEmpty() )
+        {
+            remoteRepositories = this.remoteRepositories;
+        }
+        else
+        {
+            remoteRepositories = new ArrayList(this.remoteRepositories);
+            remoteRepositories.addAll(extraRemoteRepositories);
         }
 
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )

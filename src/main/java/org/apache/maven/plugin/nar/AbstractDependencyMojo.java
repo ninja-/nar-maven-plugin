@@ -19,7 +19,10 @@ package org.apache.maven.plugin.nar;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -42,10 +45,38 @@ public abstract class AbstractDependencyMojo
         return localRepository;
     }
 
+    /**
+     * Artifact resolver, needed to download the attached nar files.
+     *
+     * @component role="org.apache.maven.artifact.resolver.ArtifactResolver"
+     * @required
+     * @readonly
+     */
+    private ArtifactResolver artifactResolver;
+
+	protected final ArtifactResolver getArtifactResolver()
+    {
+        return artifactResolver;
+    }
+
+    /**
+     * Remote repositories which will be searched for nar attachments.
+     *
+     * @parameter expression="${project.remoteArtifactRepositories}"
+     * @required
+     * @readonly
+     */
+    private List remoteArtifactRepositories;
+
+    protected final List /* ArtifactRepository */ getRemoteArtifactRepositories()
+    {
+        return remoteArtifactRepositories;
+    }
+
     protected final NarManager getNarManager()
         throws MojoFailureException, MojoExecutionException
     {
-        return new NarManager( getLog(), getLocalRepository(), getMavenProject(), getArchitecture(), getOS(),
-                               getLinker() );
+        return new NarManager( getLog(), getLocalRepository(), getRemoteArtifactRepositories(), getArtifactResolver(),
+                               getMavenProject(), getArchitecture(), getOS(), getLinker() );
     }
 }
