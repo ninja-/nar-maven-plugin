@@ -391,7 +391,13 @@ public class NarManager
 		return project.getCompileArtifacts();
 	}
 
-    public final void downloadAttachedNars( List/* <NarArtifacts> */narArtifacts, List remoteRepositories,
+    public final void downloadAttachedNars( List/* <NarArtifacts> */narArtifacts, String classifier)
+        throws MojoExecutionException, MojoFailureException
+    {
+        downloadAttachedNars( narArtifacts, null, null, classifier);
+    }
+
+    public final void downloadAttachedNars( List/* <NarArtifacts> */narArtifacts, List extraRemoteRepositories,
 			ArtifactResolver resolver, String classifier)
         throws MojoExecutionException, MojoFailureException
     {

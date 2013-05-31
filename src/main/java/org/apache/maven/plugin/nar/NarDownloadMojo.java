@@ -44,14 +44,13 @@ public class NarDownloadMojo
         List narArtifacts = getNarManager().getNarDependencies( "compile" );
         if ( classifiers == null )
         {
-            getNarManager().downloadAttachedNars( narArtifacts, remoteArtifactRepositories, artifactResolver, null );
+            getNarManager().downloadAttachedNars( narArtifacts, null );
         }
         else
         {
             for ( Iterator j = classifiers.iterator(); j.hasNext(); )
             {
-                getNarManager().downloadAttachedNars( narArtifacts, remoteArtifactRepositories, artifactResolver,
-                                                      (String) j.next() );
+                getNarManager().downloadAttachedNars( narArtifacts, (String) j.next() );
             }
         }
     }
