@@ -285,6 +285,7 @@ public class NarManager
 		dependency.isSnapshot();
 
         File file = new File( repository.getBasedir(), repository.pathOf( dependency ) );
+        log.debug("File location: " + file.getAbsolutePath());
         if ( !file.exists() )
         {
 			return null;
@@ -352,14 +353,18 @@ public class NarManager
     {
 		// FIXME this may not be the right way to do this.... -U ignored and
 		// also SNAPSHOT not used
+        log.debug("classifier: " + classifier);
 		List dependencies = getAttachedNarDependencies(narArtifacts, classifier);
 
-        log.debug( "Download called with classifier: " + classifier + " for NarDependencies {" );
-        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+        if ( log.isDebugEnabled() )
         {
-			log.debug("  - " + (i.next()));
-		}
-		log.debug("}");
+            log.debug( "Download called with classifier: " + classifier + " for NarDependencies {" );
+            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+            {
+			    log.debug("  - " + (i.next()));
+		    }
+		    log.debug("}");
+        }
 
         for ( Iterator i = dependencies.iterator(); i.hasNext(); )
         {
