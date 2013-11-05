@@ -1,4 +1,3 @@
-
 <!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
 	license agreements. See the NOTICE file distributed with this work for additional 
 	information regarding copyright ownership. The ASF licenses this file to 
@@ -83,7 +82,7 @@
 			<configuration>
 				<type>nar</type>
 				<!-- NAR-121 <extension>jar</extension> -->
-				<extension>nar</extension>
+				<extension>jar</extension>
 				<packaging>nar</packaging>
 				<language>java</language>
 				<addedToClasspath>true</addedToClasspath>
