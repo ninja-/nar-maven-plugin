@@ -18,13 +18,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>maven-plugins</artifactId>
-    <groupId>org.apache.maven.plugins</groupId>
-    <version>23</version>
-    <relativePath />
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
   </parent>
 
-  <groupId>com.github.maven-nar</groupId>
+  <groupId>net.md_5</groupId>
   <artifactId>nar-maven-plugin</artifactId>
   <version>3.0.0-SpigotMC-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
